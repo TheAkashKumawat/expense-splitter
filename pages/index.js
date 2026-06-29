@@ -4,16 +4,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { 
-  Calculator, 
-  Receipt, 
-  UserPlus, 
-  Split, 
-  Zap, 
-  Clock, 
-  ChevronDown, 
-  ChevronUp, 
-  ShieldCheck, 
+import {
+  Calculator,
+  Receipt,
+  UserPlus,
+  Split,
+  Zap,
+  Clock,
+  ChevronDown,
+  ChevronUp,
+  ShieldCheck,
   ArrowRight,
   Sparkles,
   Smartphone,
@@ -157,7 +157,7 @@ export default function Home({ groups = [], user = null }) {
   return (
     <>
       <Head>
-        <title>SettliX — Group Expenses Splitter with UPI QR Codes</title>
+        <title>SettliX</title>
       </Head>
 
       <div className="relative overflow-hidden bg-bg min-h-screen text-slate-800">
@@ -166,10 +166,10 @@ export default function Home({ groups = [], user = null }) {
         <div className="absolute top-1/3 right-10 w-[400px] h-[400px] bg-brand/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-4 py-12 md:py-20 relative z-10">
-          
+
           {/* Hero Section */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center mb-24">
-            
+
             {/* Left Column: Welcome or Auth Form */}
             <div className="lg:col-span-7 space-y-8">
               <motion.div
@@ -241,22 +241,20 @@ export default function Home({ groups = [], user = null }) {
                   className="max-w-md mx-auto lg:mx-0 bg-white border border-slate-200/80 shadow-2xl rounded-2xl p-6 md:p-8 space-y-6 relative group"
                 >
                   <div className="absolute -inset-0.5 bg-gradient-main rounded-2xl blur-sm opacity-5 group-hover:opacity-10 transition-opacity" />
-                  
+
                   {/* Tabs */}
                   <div className="relative z-10 flex border-b border-slate-100 pb-3">
                     <button
                       onClick={() => { setAuthTab('login'); setAuthError(''); }}
-                      className={`flex-1 text-center font-heading text-lg font-bold pb-2 border-b-2 transition-all ${
-                        authTab === 'login' ? 'border-brand text-brand' : 'border-transparent text-slate-400'
-                      }`}
+                      className={`flex-1 text-center font-heading text-lg font-bold pb-2 border-b-2 transition-all ${authTab === 'login' ? 'border-brand text-brand' : 'border-transparent text-slate-400'
+                        }`}
                     >
                       Log In
                     </button>
                     <button
                       onClick={() => { setAuthTab('signup'); setAuthError(''); }}
-                      className={`flex-1 text-center font-heading text-lg font-bold pb-2 border-b-2 transition-all ${
-                        authTab === 'signup' ? 'border-brand text-brand' : 'border-transparent text-slate-400'
-                      }`}
+                      className={`flex-1 text-center font-heading text-lg font-bold pb-2 border-b-2 transition-all ${authTab === 'signup' ? 'border-brand text-brand' : 'border-transparent text-slate-400'
+                        }`}
                     >
                       Sign Up
                     </button>
@@ -421,7 +419,7 @@ export default function Home({ groups = [], user = null }) {
                         <div className="bg-brand w-1/3 h-full rounded-full" />
                       </div>
                     </div>
-                    
+
                     <div className="bg-white border border-slate-100 rounded-xl p-2.5 shadow-sm space-y-2">
                       <div className="flex justify-between items-start">
                         <div>
@@ -457,14 +455,14 @@ export default function Home({ groups = [], user = null }) {
                       </span>
                       <span className="text-[9px] text-slate-400 font-mono">04:59</span>
                     </div>
-                    
+
                     {/* Visual QR Simulator */}
                     <div className="w-20 h-20 bg-slate-100 border border-slate-200/80 rounded-lg p-1.5 flex items-center justify-center">
                       <div className="w-full h-full border-2 border-dashed border-slate-300 rounded flex items-center justify-center text-slate-400 text-[10px]">
                         QR Code
                       </div>
                     </div>
-                    
+
                     <span className="text-[9px] font-bold text-brand uppercase tracking-wider">UPI Offline Settle</span>
                   </div>
                 </div>
@@ -488,7 +486,7 @@ export default function Home({ groups = [], user = null }) {
                   + Create New Group
                 </Link>
               </div>
-              
+
               {groups.length === 0 ? (
                 <div className="bg-white border border-slate-100 shadow-card rounded-2xl p-12 text-center">
                   <p className="text-slate-400 text-lg mb-6">You don&apos;t have any active groups yet.</p>
@@ -520,7 +518,7 @@ export default function Home({ groups = [], user = null }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              
+
               {/* Feature 1 */}
               <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col space-y-4 hover:border-brand/40 hover:scale-[1.01] transition-all duration-300">
                 <div className="w-12 h-12 rounded-xl bg-brand-light flex items-center justify-center">
@@ -623,8 +621,8 @@ export default function Home({ groups = [], user = null }) {
               {faqItems.map((item, idx) => {
                 const isOpen = expandedFaq === idx;
                 return (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm transition-all duration-300"
                   >
                     <button
