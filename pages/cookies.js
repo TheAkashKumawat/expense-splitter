@@ -5,7 +5,7 @@ export default function CookiePolicy() {
   return (
     <>
       <Head>
-        <title>Cookie Policy | SpliEasy</title>
+        <title>Cookie Policy | SettliX</title>
       </Head>
       <div className="max-w-4xl mx-auto px-6 py-16 text-slate-700">
         <Link href="/" className="text-sm font-semibold text-brand hover:text-emerald-800 transition-colors">
@@ -17,14 +17,14 @@ export default function CookiePolicy() {
           <section>
             <h2 className="text-lg font-bold text-slate-850 mb-3">1. Use of Cookies</h2>
             <p className="text-sm leading-relaxed text-slate-600">
-              SpliEasy uses simple, essential local cookies and session variables to track group views, browser states, and local caching values.
+              SettliX uses simple, essential local cookies and session variables to track group views, browser states, and local caching values.
             </p>
           </section>
 
           <section className="pt-4 border-t border-slate-100">
-            <h2 className="text-lg font-bold text-slate-850 mb-3">2. Third-Party Scripts</h2>
+            <h2 className="text-lg font-bold text-slate-850 mb-3">2. Session Management</h2>
             <p className="text-sm leading-relaxed text-slate-600">
-              Third-party cookies may be configured dynamically when initializing Checkout frames via Razorpay scripts (`https://checkout.razorpay.com/v1/checkout.js`) to secure session contexts during payment simulations.
+              Essential session tracking and authentication variables are stored securely to handle persistent user login statuses.
             </p>
           </section>
 

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { createWorker } from 'tesseract.js';
@@ -21,15 +22,20 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
   const [category, setCategory] = useState('Others');
   const [currency, setCurrency] = useState('INR');
   const [exchangeRate, setExchangeRate] = useState(1);
-  const [splitMode, setSplitMode] = useState('equally'); // equally, unequally, percentages, shares
-  
+  const [splitMode, setSplitMode] = useState('equally'); // equally, unequally, percentages, shares, itemized
+
   // Stores raw input values (%, shares, or currency)
   const [splitValues, setSplitValues] = useState({});
   // Stores calculated currency amounts (always sums to totalAmount)
   const [calculatedSplits, setCalculatedSplits] = useState({});
-  
+
+  // Itemized splitting items state
+  const [items, setItems] = useState([{ name: '', price: '', members: group?.members.map(m => m._id) || [] }]);
+
   const [loading, setLoading] = useState(false);
   const [scanLoading, setScanLoading] = useState(false);
+  const [showScanMenu, setShowScanMenu] = useState(false);
+  const [scanSuccess, setScanSuccess] = useState('');
   const [error, setError] = useState('');
 
   // Fetch exchange rate relative to INR
@@ -55,7 +61,7 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
   }, [currency]);
 
   // Helper to initialize split inputs
-  const initializeSplitValues = (mode) => {
+  const initializeSplitValues = useCallback((mode) => {
     if (!group || !group.members) return;
     const newValues = {};
     group.members.forEach(m => {
@@ -70,19 +76,27 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
       }
     });
     setSplitValues(newValues);
-  };
+  }, [group]);
 
   // Initialize values when component mounts or splitMode changes
   useEffect(() => {
     initializeSplitValues(splitMode);
-  }, [group, splitMode]);
+  }, [initializeSplitValues, splitMode]);
 
-  // Recalculate splits whenever totalAmount, splitMode, or splitValues change
+  // Sync totalAmount with items sum in itemized mode
+  useEffect(() => {
+    if (splitMode === 'itemized') {
+      const sum = items.reduce((acc, item) => acc + (parseFloat(item.price) || 0), 0);
+      setTotalAmount(sum > 0 ? sum.toFixed(2) : '');
+    }
+  }, [items, splitMode]);
+
+  // Recalculate splits whenever totalAmount, splitMode, splitValues, or items change
   useEffect(() => {
     if (!group || !group.members) return;
     const amount = parseFloat(totalAmount) || 0;
     const membersCount = group.members.length;
-    
+
     if (amount <= 0 || membersCount === 0) {
       const zeroSplits = {};
       group.members.forEach(m => zeroSplits[m._id] = 0);
@@ -103,12 +117,12 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
           sum += splitAmount;
         }
       });
-    } 
+    }
     else if (splitMode === 'unequally') {
       group.members.forEach(m => {
         newCalculated[m._id] = parseFloat(splitValues[m._id]) || 0;
       });
-    } 
+    }
     else if (splitMode === 'percentages') {
       const totalPercent = Object.values(splitValues).reduce((a, b) => a + (parseFloat(b) || 0), 0);
       if (totalPercent > 0) {
@@ -125,7 +139,7 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
       } else {
         group.members.forEach(m => newCalculated[m._id] = 0);
       }
-    } 
+    }
     else if (splitMode === 'shares') {
       const totalShares = Object.values(splitValues).reduce((a, b) => a + (parseInt(b) || 0), 0);
       if (totalShares > 0) {
@@ -143,17 +157,74 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
         group.members.forEach(m => newCalculated[m._id] = 0);
       }
     }
+    else if (splitMode === 'itemized') {
+      // Reset calculated splits to 0
+      group.members.forEach(m => newCalculated[m._id] = 0);
+
+      // Loop through items and distribute shares
+      items.forEach(item => {
+        const price = parseFloat(item.price) || 0;
+        const selectedCount = item.members.length;
+        if (price > 0 && selectedCount > 0) {
+          const share = parseFloat((price / selectedCount).toFixed(2));
+          let itemSum = 0;
+          item.members.forEach((memberId, idx) => {
+            const memberExists = group.members.some(m => m._id === memberId);
+            if (memberExists) {
+              if (idx === selectedCount - 1) {
+                newCalculated[memberId] += parseFloat((price - itemSum).toFixed(2));
+              } else {
+                newCalculated[memberId] += share;
+                itemSum += share;
+              }
+            }
+          });
+        }
+      });
+    }
 
     setCalculatedSplits(newCalculated);
-  }, [totalAmount, splitMode, splitValues, group]);
+  }, [totalAmount, splitMode, splitValues, group, items]);
 
   const handleValueChange = (memberId, val) => {
     setSplitValues(prev => ({ ...prev, [memberId]: val }));
   };
 
+  const handleAddItem = () => {
+    setItems(prev => [...prev, { name: '', price: '', members: group?.members.map(m => m._id) || [] }]);
+  };
+
+  const handleRemoveItem = (index) => {
+    if (items.length <= 1) return;
+    setItems(prev => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleItemFieldChange = (index, field, val) => {
+    setItems(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: val };
+      return updated;
+    });
+  };
+
+  const handleToggleMemberOnItem = (itemIndex, memberId) => {
+    setItems(prev => {
+      const updated = [...prev];
+      const currentMembers = updated[itemIndex].members;
+      if (currentMembers.includes(memberId)) {
+        updated[itemIndex] = { ...updated[itemIndex], members: currentMembers.filter(id => id !== memberId) };
+      } else {
+        updated[itemIndex] = { ...updated[itemIndex], members: [...currentMembers, memberId] };
+      }
+      return updated;
+    });
+  };
+
+
+
   // Receipt Scanner Parser Logic
   const handleReceiptScan = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target && e.target.files ? e.target.files[0] : e;
     if (!file) return;
 
     setScanLoading(true);
@@ -173,11 +244,11 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
 
       // Heuristic 1: Extract Description (Merchant Name)
       const merchantLine = lines.find(line => {
-        return line.length > 3 && 
-               !/\d/.test(line) && 
-               !line.toLowerCase().includes('total') && 
-               !line.toLowerCase().includes('amount') &&
-               !line.toLowerCase().includes('tax');
+        return line.length > 3 &&
+          !/\d/.test(line) &&
+          !line.toLowerCase().includes('total') &&
+          !line.toLowerCase().includes('amount') &&
+          !line.toLowerCase().includes('tax');
       });
       if (merchantLine) {
         setDescription(merchantLine.substring(0, 30));
@@ -240,6 +311,12 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
         setCategory('Entertainment');
       }
 
+      const finalAmt = extractedAmount > 0 ? extractedAmount : (typeof maxNumber !== 'undefined' ? maxNumber : 0);
+      if (merchantLine || finalAmt > 0) {
+        setScanSuccess(`✨ Receipt parsed! ${merchantLine ? `Merchant: "${merchantLine}"` : ''} ${finalAmt > 0 ? `Amount: ₹${finalAmt}` : ''}`);
+        setTimeout(() => setScanSuccess(''), 6000);
+      }
+
     } catch (err) {
       setError(err.message || 'Failed to scan receipt.');
     } finally {
@@ -266,7 +343,7 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
         setLoading(false);
         return;
       }
-    } 
+    }
     else if (splitMode === 'percentages') {
       const totalPercent = Object.values(splitValues).reduce((a, b) => a + (parseFloat(b) || 0), 0);
       if (Math.abs(totalPercent - 100) > 0.1) {
@@ -274,11 +351,19 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
         setLoading(false);
         return;
       }
-    } 
+    }
     else if (splitMode === 'shares') {
       const totalShares = Object.values(splitValues).reduce((a, b) => a + (parseInt(b) || 0), 0);
       if (totalShares <= 0) {
         setError('Total shares must be greater than 0');
+        setLoading(false);
+        return;
+      }
+    }
+    else if (splitMode === 'itemized') {
+      const hasUnassigned = items.some(item => (parseFloat(item.price) || 0) > 0 && item.members.length === 0);
+      if (hasUnassigned) {
+        setError('Every item with a price must have at least one member assigned to it');
         setLoading(false);
         return;
       }
@@ -303,11 +388,12 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
         category,
         splits: formattedSplits
       });
-      
+
       setDescription('');
       setTotalAmount('');
       setCategory('Others');
       setCurrency('INR');
+      setItems([{ name: '', price: '', members: group?.members.map(m => m._id) || [] }]);
       initializeSplitValues(splitMode);
       if (onExpenseAdded) onExpenseAdded(res.data);
     } catch (err) {
@@ -323,38 +409,98 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
     { id: 'equally', label: 'Equally' },
     { id: 'unequally', label: 'Unequally' },
     { id: 'percentages', label: 'By %' },
-    { id: 'shares', label: 'By Shares' }
+    { id: 'shares', label: 'By Shares' },
+    { id: 'itemized', label: 'Itemized 🍔' }
   ];
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-white border border-slate-100 shadow-card rounded-2xl p-6 mb-8">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-heading text-xl font-bold text-slate-800">Add Expense</h3>
-        
+
         {/* Receipt Uploader Control */}
-        <div className="relative overflow-hidden bg-slate-50 hover:bg-slate-100 border border-slate-200 border-dashed rounded-xl px-4 py-2 flex items-center gap-2 cursor-pointer transition-all">
+        <div className="relative">
+          <button
+            type="button"
+            disabled={scanLoading}
+            onClick={() => setShowScanMenu(!showScanMenu)}
+            className="bg-slate-50 hover:bg-slate-100 border border-slate-200 border-dashed rounded-xl px-4 py-2 flex items-center gap-2 cursor-pointer transition-all text-slate-700 font-bold text-xs"
+          >
+            {scanLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-brand/30 border-t-brand rounded-full animate-spin" />
+                <span>Scanning...</span>
+              </>
+            ) : (
+              <>
+                <Camera className="w-4 h-4 text-slate-600" />
+                <span>Scan Receipt</span>
+              </>
+            )}
+          </button>
+
+          {showScanMenu && !scanLoading && (
+            <>
+              {/* Backdrop to close click outside */}
+              <div className="fixed inset-0 z-40" onClick={() => setShowScanMenu(false)} />
+
+              {/* Dropdown Menu */}
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl py-1.5 z-50 animate-fade-in text-xs font-semibold text-slate-700">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowScanMenu(false);
+                    document.getElementById('camera-input').click();
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-2"
+                >
+                  <Camera className="w-4 h-4 text-slate-400" />
+                  Take Photo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowScanMenu(false);
+                    document.getElementById('gallery-input').click();
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4 text-slate-400" />
+                  Choose from Files
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Hidden inputs */}
           <input
+            id="camera-input"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            disabled={scanLoading}
+            onChange={handleReceiptScan}
+            className="hidden"
+          />
+          <input
+            id="gallery-input"
             type="file"
             accept="image/*"
             disabled={scanLoading}
             onChange={handleReceiptScan}
-            className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
+            className="hidden"
           />
-          {scanLoading ? (
-            <>
-              <div className="w-4 h-4 border-2 border-brand/30 border-t-brand rounded-full animate-spin" />
-              <span className="text-xs text-slate-500">Scanning...</span>
-            </>
-          ) : (
-            <>
-              <Camera className="w-4 h-4 text-slate-600" />
-              <span className="text-xs text-slate-700 font-bold">Scan Receipt</span>
-            </>
-          )}
         </div>
       </div>
-      
+
       {error && <div className="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm mb-4 font-semibold">{error}</div>}
+
+      {scanSuccess && (
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm mb-4 font-semibold flex items-center justify-between shadow-sm animate-pulse-slow">
+          <span>{scanSuccess}</span>
+          <button type="button" onClick={() => setScanSuccess('')} className="text-emerald-500 hover:text-emerald-700 font-black text-base px-1">×</button>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -393,9 +539,10 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
               min="0.01"
               step="0.01"
               value={totalAmount}
+              disabled={splitMode === 'itemized'}
               onChange={(e) => setTotalAmount(e.target.value)}
-              className="bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand rounded-xl px-4 py-3 text-slate-800 outline-none w-full transition-all font-semibold"
-              placeholder="0.00"
+              className="bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand rounded-xl px-4 py-3 text-slate-800 outline-none w-full transition-all font-semibold disabled:opacity-75 disabled:cursor-not-allowed"
+              placeholder={splitMode === 'itemized' ? 'Computed from items' : '0.00'}
             />
           </div>
         </div>
@@ -431,11 +578,10 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
                   key={cat.id}
                   type="button"
                   onClick={() => setCategory(cat.id)}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200 ${
-                    isSelected
-                      ? `${cat.activeColor} ring-1 shadow-sm`
-                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-300'
-                  }`}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200 ${isSelected
+                    ? `${cat.activeColor} ring-1 shadow-sm`
+                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-300'
+                    }`}
                 >
                   <IconComp className="w-5 h-5 mb-1.5 animate-bounce-short" />
                   <span className="text-[11px] font-bold">{cat.label}</span>
@@ -454,52 +600,142 @@ export default function AddExpenseForm({ group, onExpenseAdded }) {
                 key={tab.id}
                 type="button"
                 onClick={() => setSplitMode(tab.id)}
-                className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  splitMode === tab.id
-                    ? 'bg-gradient-main text-white shadow-glow'
-                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200/50'
-                }`}
+                className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all duration-200 ${splitMode === tab.id
+                  ? 'bg-gradient-main text-white shadow-glow'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200/50'
+                  }`}
               >
                 {tab.label}
               </button>
             ))}
           </div>
 
-          {/* Render Member Inputs */}
-          <div className="space-y-2">
-            {group.members.map(m => {
-              let suffix = currency;
-              let isInputDisabled = false;
-              let step = 'any';
-              let min = '0';
+          {/* Render Member Inputs or Itemized Editor */}
+          {splitMode === 'itemized' ? (
+            <div className="space-y-4 bg-slate-50 border border-slate-200/60 p-4 rounded-xl">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Item Breakdown</span>
+                <button
+                  type="button"
+                  onClick={handleAddItem}
+                  className="text-xs bg-brand hover:bg-emerald-800 text-white font-extrabold px-3.5 py-1.5 rounded-lg transition-colors flex items-center gap-1 shadow-sm"
+                >
+                  + Add Item
+                </button>
+              </div>
 
-              if (splitMode === 'equally') {
-                suffix = currency;
-                isInputDisabled = true;
-              } else if (splitMode === 'percentages') {
-                suffix = '%';
-                step = '0.1';
-              } else if (splitMode === 'shares') {
-                suffix = 'share';
-                step = '1';
-                min = '0';
-              }
+              {items.map((item, idx) => (
+                <div key={idx} className="bg-white border border-slate-100 p-3 rounded-lg space-y-3 shadow-sm relative animate-fade-in">
+                  <button
+                    type="button"
+                    disabled={items.length <= 1}
+                    onClick={() => handleRemoveItem(idx)}
+                    className="absolute top-2.5 right-2.5 text-slate-400 hover:text-rose-600 transition-colors disabled:opacity-20 disabled:hover:text-slate-400 font-extrabold text-base px-1"
+                    title="Delete item"
+                  >
+                    ×
+                  </button>
 
-              return (
-                <SplitInput
-                  key={m._id}
-                  member={m}
-                  value={splitMode === 'equally' ? calculatedSplits[m._id] || 0 : splitValues[m._id] || 0}
-                  calculatedAmount={splitMode !== 'equally' ? calculatedSplits[m._id] : undefined}
-                  onChange={handleValueChange}
-                  suffix={suffix}
-                  disabled={isInputDisabled}
-                  step={step}
-                  min={min}
-                />
-              );
-            })}
-          </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-2">
+                      <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Item Description</label>
+                      <input
+                        type="text"
+                        required
+                        value={item.name}
+                        onChange={(e) => handleItemFieldChange(idx, 'name', e.target.value)}
+                        placeholder="e.g. Garlic Bread"
+                        className="bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand rounded-lg px-3 py-2 text-xs outline-none w-full font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Price ({currency})</label>
+                      <input
+                        type="number"
+                        required
+                        min="0.01"
+                        step="0.01"
+                        value={item.price}
+                        onChange={(e) => handleItemFieldChange(idx, 'price', e.target.value)}
+                        placeholder="0.00"
+                        className="bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand rounded-lg px-3 py-2 text-xs outline-none w-full font-semibold"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1.5">Who shared this?</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {group.members.map(m => {
+                        const isAssigned = item.members.includes(m._id);
+                        return (
+                          <button
+                            key={m._id}
+                            type="button"
+                            onClick={() => handleToggleMemberOnItem(idx, m._id)}
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold border transition-all duration-150 ${isAssigned
+                              ? 'bg-emerald-50 border-emerald-200 text-brand ring-1 ring-emerald-300'
+                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                              }`}
+                          >
+                            {m.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Calculated Splits preview under itemized breakdown */}
+              <div className="border-t border-slate-200/60 pt-3 mt-3">
+                <label className="block text-[10px] text-slate-400 font-bold uppercase mb-2">Calculated Share Preview</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {group.members.map(m => (
+                    <div key={m._id} className="bg-white border border-slate-100 p-2 rounded-lg text-center shadow-sm">
+                      <div className="text-[10px] text-slate-500 font-semibold truncate">{m.name}</div>
+                      <div className="text-xs font-black text-slate-800 mt-0.5">₹{(calculatedSplits[m._id] || 0).toFixed(2)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {group.members.map(m => {
+                let suffix = currency;
+                let isInputDisabled = false;
+                let step = 'any';
+                let min = '0';
+
+                if (splitMode === 'equally') {
+                  suffix = currency;
+                  isInputDisabled = true;
+                } else if (splitMode === 'percentages') {
+                  suffix = '%';
+                  step = '0.1';
+                } else if (splitMode === 'shares') {
+                  suffix = 'share';
+                  step = '1';
+                  min = '0';
+                }
+
+                return (
+                  <SplitInput
+                    key={m._id}
+                    member={m}
+                    value={splitMode === 'equally' ? calculatedSplits[m._id] || 0 : splitValues[m._id] || 0}
+                    calculatedAmount={splitMode !== 'equally' ? calculatedSplits[m._id] : undefined}
+                    onChange={handleValueChange}
+                    suffix={suffix}
+                    disabled={isInputDisabled}
+                    step={step}
+                    min={min}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <button

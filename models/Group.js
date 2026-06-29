@@ -8,7 +8,8 @@ const MemberSchema = new mongoose.Schema({
 const GroupSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String },
-  members: [MemberSchema]
+  members: [MemberSchema],
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }
 }, { timestamps: true });
 
 export default mongoose.models.Group || mongoose.model('Group', GroupSchema);

@@ -100,12 +100,12 @@ export default function CalculationBreakdown({ group, expenses = [], settlements
   const currentLedger = getLedgerForMember(selectedMemberId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex justify-center items-start p-4 bg-slate-900/60 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-4xl max-h-[85vh] overflow-hidden bg-white border border-slate-100 rounded-2xl flex flex-col shadow-2xl"
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white border border-slate-100 rounded-2xl flex flex-col shadow-2xl my-auto"
       >
         {/* Header */}
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">

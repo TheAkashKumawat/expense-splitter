@@ -37,23 +37,23 @@ export default function TransactionHistory({ settlements = [] }) {
           const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
 
           return (
-            <div key={settlement._id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-brand/20 transition-all">
-              <div className="flex flex-col">
-                <span className="text-slate-800 font-semibold">
+            <div key={settlement._id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-brand/20 transition-all gap-4">
+              <div className="flex-grow min-w-0">
+                <div className="text-slate-800 font-semibold truncate">
                   {settlement.fromName} <span className="text-slate-400 font-normal mx-1">→</span> {settlement.toName}
-                </span>
-                <span className="text-xs text-slate-400 mt-1 font-medium">
+                </div>
+                <div className="text-[10px] text-slate-450 mt-1 font-medium truncate">
                   {formattedDate} 
                   {settlement.razorpayPaymentId && (
-                    <span className="ml-2 font-mono text-xs opacity-80">
-                      • {settlement.razorpayPaymentId.substring(0, 12)}...
+                    <span className="ml-1.5 font-mono text-[10px] opacity-80">
+                      • {settlement.razorpayPaymentId.substring(0, 8)}...
                     </span>
                   )}
-                </span>
+                </div>
               </div>
-              <div className="flex items-center gap-4 mt-3 sm:mt-0">
-                <span className="text-slate-800 font-extrabold">₹{settlement.amount}</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${badgeColor}`}>
+              <div className="flex flex-col items-end flex-shrink-0 text-right">
+                <span className="text-slate-800 font-extrabold text-sm">₹{settlement.amount}</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize mt-1 ${badgeColor}`}>
                   {settlement.status === 'created' ? 'pending' : settlement.status}
                 </span>
               </div>

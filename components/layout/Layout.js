@@ -15,25 +15,25 @@ export default function Layout({ children }) {
           <section>
             <h3 className="text-base font-bold text-slate-800 mb-2">1. Information We Collect</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              SpliEasy operates primarily as a local expense splitting manager. We collect data you explicitly enter into the application, including:
+              SettliX operates primarily as a local expense splitting manager. We collect data you explicitly enter into the application, including:
             </p>
             <ul className="list-disc list-inside text-xs text-slate-600 mt-2 space-y-1">
               <li>Group Names and Descriptions</li>
-              <li>Member Names (provided during group onboarding)</li>
-              <li>Expense records (amount, description, payer, split shares, and category tags)</li>
-              <li>Settlement logs (Razorpay payment identifiers, status updates, and timestamps)</li>
+              <li>Member Names and UPI IDs (provided during group onboarding)</li>
+              <li>Expense records (amount, description, payer, and split shares)</li>
+              <li>Settlement logs (offline transaction statuses and timestamps)</li>
             </ul>
           </section>
           <section className="pt-4 border-t border-slate-100">
             <h3 className="text-base font-bold text-slate-800 mb-2">2. How We Store Your Data</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Your data is stored securely in a MongoDB database configured in your local environment variables. We do not transmit your transactions, split history, or user rosters to third-party databases, except as required to initialize transactions through payment portals.
+              Your data is stored securely in a MongoDB database configured in your local environment variables. We do not transmit your transactions, split history, or user rosters to third-party databases.
             </p>
           </section>
           <section className="pt-4 border-t border-slate-100">
             <h3 className="text-base font-bold text-slate-800 mb-2">3. Payment & Transaction Security</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              All in-app payments are processed via Razorpay API gateways. During Sandbox testing, no actual financial card info is stored or processed. Payment transactions verify signatures server-side using secure HMAC-SHA256 configurations to prevent tamper attempts.
+              All in-app settlements occur directly peer-to-peer outside the application using offline UPI QR codes. No financial card information is stored, processed, or transmitted by SettliX.
             </p>
           </section>
           <section className="pt-4 border-t border-slate-100">
@@ -52,25 +52,25 @@ export default function Layout({ children }) {
           <section>
             <h3 className="text-base font-bold text-slate-800 mb-2">1. Acceptance of Terms</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              By using SpliEasy, you agree to comply with and be bound by the terms outlined below. If you do not agree, please discontinue using the service immediately.
+              By using SettliX, you agree to comply with and be bound by the terms outlined below. If you do not agree, please discontinue using the service immediately.
             </p>
           </section>
           <section className="pt-4 border-t border-slate-100">
-            <h3 className="text-base font-bold text-slate-800 mb-2">2. Sandbox Testing Clause</h3>
+            <h3 className="text-base font-bold text-slate-800 mb-2">2. P2P Settlements Clause</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              SpliEasy is currently configured in <strong className="text-slate-800">Razorpay Sandbox / Test Mode</strong>. Transactions processed through the portal do not utilize real currency, nor do they constitute real financial transfers. Under no circumstances should live financial credentials or personal cards containing real balances be inputted during testing.
+              SettliX generates direct, offline peer-to-peer UPI QR codes. We do not process payments, route card data, or store financial credentials. All payments happen externally between users.
             </p>
           </section>
           <section className="pt-4 border-t border-slate-100">
             <h3 className="text-base font-bold text-slate-800 mb-2">3. Liability Disclaimer</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              SpliEasy is provided &ldquo;as is&rdquo; by WebTantu. We are not responsible for transaction discrepancies, ledger calculation adjustments, server downtime, database corruption, or failures resulting from unauthorized edits to signature verification endpoints.
+              SettliX is provided &ldquo;as is&rdquo; by WebTantu. We are not responsible for transaction discrepancies, ledger calculation adjustments, server downtime, database corruption, or failures.
             </p>
           </section>
           <section className="pt-4 border-t border-slate-100">
             <h3 className="text-base font-bold text-slate-800 mb-2">4. Amendments</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              We reserve the right to modify these terms or release structural updates (e.g. current version 2.4.1) without prior individual notification.
+              We reserve the right to modify these terms or release structural updates without prior individual notification.
             </p>
           </section>
         </div>
@@ -83,13 +83,13 @@ export default function Layout({ children }) {
           <section>
             <h3 className="text-base font-bold text-slate-800 mb-2">1. Use of Cookies</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              SpliEasy uses simple, essential local cookies and session variables to track group views, browser states, and local caching values.
+              SettliX uses simple, essential local cookies and session variables to track group views, browser states, and local caching values.
             </p>
           </section>
           <section className="pt-4 border-t border-slate-100">
-            <h3 className="text-base font-bold text-slate-800 mb-2">2. Third-Party Scripts</h3>
+            <h3 className="text-base font-bold text-slate-800 mb-2">2. Session Management</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Third-party cookies may be configured dynamically when initializing Checkout frames via Razorpay scripts (<code className="bg-slate-50 px-1 py-0.5 rounded text-xs text-brand">https://checkout.razorpay.com/v1/checkout.js</code>) to secure session contexts during payment simulations.
+              Essential session tracking and authentication variables are stored securely to handle persistent user login statuses.
             </p>
           </section>
           <section className="pt-4 border-t border-slate-100">
@@ -121,7 +121,10 @@ export default function Layout({ children }) {
       <footer className="border-t border-slate-100 bg-white py-10 text-center text-xs text-slate-400 mt-12 font-medium shadow-sm">
         <div className="max-w-6xl mx-auto px-4 flex flex-col items-center gap-4">
           <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4 border-b border-slate-100 pb-6">
-            <p className="text-slate-500">© 2026 SpliEasy. All Rights Reserved.</p>
+            <div className="flex items-center gap-2.5">
+              <img src="/logo.png" alt="SettliX Logo" className="h-7 w-auto object-contain" />
+              <span className="text-slate-500">© 2026. All Rights Reserved.</span>
+            </div>
             <div className="flex items-center gap-3 text-slate-400">
               <button
                 onClick={() => setActivePolicy('privacy')}
@@ -155,8 +158,8 @@ export default function Layout({ children }) {
       </footer>
 
       {activePolicy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-xl max-w-2xl w-full max-h-[85vh] flex flex-col text-left">
+        <div className="fixed inset-0 z-[100] flex justify-center items-start p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto flex flex-col text-left my-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
               <h2 className="text-xl font-heading font-bold text-slate-800">
                 {policies[activePolicy].title}

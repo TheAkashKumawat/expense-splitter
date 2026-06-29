@@ -6,7 +6,7 @@ export default function Document() {
       <Head>
         <meta charSet="utf-8" />
         <meta name="description" content="Split bills, track group expenses and settle instantly via UPI. Built for friends, trips and flatmates." />
-        <meta property="og:title" content="SplitEasy — Smart Expense Splitter with UPI" />
+        <meta property="og:title" content="SettliX — Smart Expense Splitter with UPI" />
         <meta property="og:description" content="Split bills, track group expenses and settle instantly via UPI. Built for friends, trips and flatmates." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
