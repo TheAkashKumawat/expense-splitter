@@ -502,14 +502,14 @@ export default function Home({ groups = [], user = null }) {
           {/* Active Groups Section: Accessible to logged in users */}
           {user && (
             <div className="mb-24">
-              <div className="flex justify-between items-end mb-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
                 <div>
                   <h2 className="font-heading text-3xl font-bold text-slate-800">Your Groups</h2>
-                  <p className="text-slate-500 text-sm mt-1">Select an active group or create a new one above</p>
+                  <p className="text-slate-500 text-sm mt-1">Select an active group or create a new one below</p>
                 </div>
                 <Link
                   href="/groups/new"
-                  className="text-brand hover:text-emerald-800 transition-colors font-bold text-sm"
+                  className="w-full sm:w-auto bg-gradient-main text-white font-bold px-5 py-2.5 rounded-xl hover:scale-[1.02] active:scale-95 transition-all text-xs sm:text-sm shadow-sm flex items-center justify-center gap-1"
                 >
                   + Create New Group
                 </Link>
