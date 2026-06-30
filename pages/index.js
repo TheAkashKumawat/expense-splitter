@@ -241,18 +241,18 @@ export default function Home({ groups = [], user = null }) {
 
                   <form onSubmit={handleQuickSubmit} className="relative group">
                     <div className="absolute -inset-1 bg-gradient-main rounded-2xl blur opacity-25 group-hover:opacity-40 transition-all duration-350" />
-                    <div className="relative bg-white border border-slate-200/80 rounded-2xl p-2 shadow-lg flex items-center gap-2">
+                    <div className="relative bg-white border border-slate-200/80 rounded-2xl p-2 shadow-lg flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                       <input
                         type="text"
                         required
                         placeholder="Enter group name (e.g. Goa Trip)..."
                         value={quickName}
                         onChange={(e) => setQuickName(e.target.value)}
-                        className="flex-1 bg-transparent px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none text-sm font-semibold"
+                        className="flex-1 bg-transparent px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none text-sm font-semibold w-full"
                       />
                       <button
                         type="submit"
-                        className="bg-gradient-main text-white font-bold px-6 py-3 rounded-xl hover:scale-[1.02] active:scale-95 transition-all text-sm flex items-center gap-1.5 whitespace-nowrap shadow-glow"
+                        className="bg-gradient-main text-white font-bold px-6 py-3 rounded-xl hover:scale-[1.02] active:scale-95 transition-all text-sm flex items-center justify-center gap-1.5 whitespace-nowrap shadow-glow w-full sm:w-auto"
                       >
                         <span>Create Group</span>
                         <ArrowRight className="w-4 h-4" />

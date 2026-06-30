@@ -347,24 +347,24 @@ export default function BalanceSummary({ group, expenses, onManageGroup }) {
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                   className="bg-slate-50 border border-slate-100 rounded-xl p-4"
                 >
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="text-sm col-span-2 text-slate-700 font-medium">
+                  <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
+                    <div className="text-sm text-slate-700 font-medium break-words max-w-[70%]">
                       <span className="font-bold text-rose-600">{debt.from}</span>
-                      <span className="text-slate-400 mx-2 font-normal">owes</span>
+                      <span className="text-slate-400 mx-1.5 font-normal">owes</span>
                       <span className="font-bold text-emerald-700">{debt.to}</span>
                     </div>
-                    <div className="font-extrabold text-slate-800">₹{debt.amount.toFixed(2)}</div>
+                    <div className="font-extrabold text-slate-800 text-right whitespace-nowrap">₹{debt.amount.toFixed(2)}</div>
                   </div>
                   
                   <div className="flex flex-col gap-2 mt-3">
                     {upiId ? (
                       <>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           <motion.button
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
                             onClick={() => setActiveUpiDebt({ ...debt, upiId })}
-                            className="bg-gradient-main text-white font-bold py-2 rounded-xl hover:shadow-glow transition-all duration-200 flex flex-col items-center justify-center gap-1 text-xs shadow-sm"
+                            className="bg-gradient-main text-white font-bold py-2.5 rounded-xl hover:shadow-glow transition-all duration-200 flex sm:flex-col items-center justify-center gap-2 sm:gap-1 text-xs shadow-sm w-full"
                             title="Pay via UPI QR Code"
                           >
                             <QrCode className="w-4 h-4" />
@@ -376,7 +376,7 @@ export default function BalanceSummary({ group, expenses, onManageGroup }) {
                             whileTap={{ scale: 0.99 }}
                             href={buildUPILink({ upiId, name: debt.to, amount: debt.amount, note: `Settling to ${debt.to}` })}
                             onClick={(e) => handleUpiDeepLinkClick(e, debt, upiId)}
-                            className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2 rounded-xl transition-all duration-200 text-[10px] flex flex-col items-center justify-center gap-1 shadow-sm"
+                            className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl transition-all duration-200 text-xs sm:text-[10px] flex sm:flex-col items-center justify-center gap-2 sm:gap-1 shadow-sm w-full"
                             title="Pay using Google Pay"
                           >
                             <img src="https://img.icons8.com/color/48/google-pay.png" alt="Google Pay Logo" className="w-5 h-5 object-contain" />
@@ -388,7 +388,7 @@ export default function BalanceSummary({ group, expenses, onManageGroup }) {
                             whileTap={{ scale: 0.99 }}
                             href={buildUPILink({ upiId, name: debt.to, amount: debt.amount, note: `Settling to ${debt.to}` })}
                             onClick={(e) => handleUpiDeepLinkClick(e, debt, upiId)}
-                            className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2 rounded-xl transition-all duration-200 text-[10px] flex flex-col items-center justify-center gap-1 shadow-sm"
+                            className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl transition-all duration-200 text-xs sm:text-[10px] flex sm:flex-col items-center justify-center gap-2 sm:gap-1 shadow-sm w-full"
                             title="Pay using PhonePe"
                           >
                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 fill-[#5f259f]">
@@ -399,7 +399,7 @@ export default function BalanceSummary({ group, expenses, onManageGroup }) {
                           </motion.a>
                         </div>
                         
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <a
                             href={getWhatsAppReminderLink(debt)}
                             target="_blank"
@@ -428,7 +428,7 @@ export default function BalanceSummary({ group, expenses, onManageGroup }) {
                           Settle Manually (Cash)
                         </motion.button>
                         
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <a
                             href={getWhatsAppReminderLink(debt)}
                             target="_blank"
