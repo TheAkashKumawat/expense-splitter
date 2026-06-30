@@ -1,88 +1,147 @@
-# 💸 SettliX — Smart Peer-to-Peer Expense Splitter
+<div align="center">
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Next.js-14.2.35-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-  <img src="https://img.shields.io/badge/MongoDB-Mongoose-green?style=for-the-badge&logo=mongodb" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4.19-blue?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel" alt="Vercel" />
-</p>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,40:022c22,70:064e3b,100:0f172a&height=220&section=header&text=SettliX&fontSize=80&fontColor=ffffff&fontAlignY=36&desc=Smart%20Peer-to-Peer%20Expense%20Splitter&descAlignY=55&descSize=20&animation=fadeIn" width="100%"/>
 
-**SettliX** is a premium, mobile-first web application designed to simplify group expenses. Built with Next.js, Tailwind CSS, and MongoDB, SettliX allows friends, roommates, and travel groups to log expenses, calculate optimal settlements, and clear debts instantly using dynamically generated peer-to-peer **UPI QR codes**.
+<br/>
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-00c896?style=for-the-badge)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind--CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![Vercel](https://img.shields.io/badge/Vercel-Hosted-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
+
+<br/>
+
+**You went on a group trip. But who owes who, and how do you settle without the hassle?**
+
+SettliX calculates the absolute **minimum transactions** required to balance your group, then generates direct, scan-and-pay **UPI QR codes** pre-filled with the exact amounts.
+
+<br/>
+
+[**Get Started**](#quick-start) · [**How It Works**](#how-it-works) · [**Features**](#features) · [**Tech Stack**](#technology-stack) · [**Local Development**](#local-development)
+
+<br/>
+
+</div>
 
 ---
 
-## ✨ Key Features
+## The Problem
 
-*   **👥 Smart Group Management:** Organize trips, shared housing, or events. Add members and assign custom UPI IDs to enable quick settlements.
-*   **💰 Advanced Expense Splitting:**
-    *   **Equally:** Distribute costs evenly among all selected group members.
-    *   **Unequally:** Define exact custom rupee amounts for each member.
-    *   **Percentage:** Split expenses by specifying percentage shares.
-*   **⚡ Dynamic UPI Integration:** SettliX automatically constructs instant peer-to-peer UPI checkout links and QR codes pre-populated with exact settlement values, recipient names, and group references.
-*   **⚖️ Optimized Debt Minimization:** Uses a transaction-minimization algorithm (minimum cash flow solver) to simplify balances, ensuring groups settle up in the fewest steps possible.
-*   **📊 Data Export & Print:** Download group logs, transaction histories, and active debt ledgers directly as a **CSV** file or print optimized summaries to **PDF**.
-*   **🎨 Premium Glassmorphic UI:** Smooth, native-feeling micro-animations powered by **Framer Motion** combined with responsive modern typography.
+```
+Total group bills:   ₹15,400
+Split logic:         equally, unequally, or percentage
+Settlement process:  ❌ endless manual calculations, back-and-forth messages, wrong UPI transfers
+```
+
+Every group trip, shared flat, or dinner outing ends with the same math problem: sorting out the ledger. Traditional splitting tools calculate debts but force you to copy-paste amounts, ask for UPI IDs repeatedly, and make multiple transactions.
+
+SettliX resolves this. It processes your group's transaction history, runs a **Transaction Minimization Algorithm** (reducing the net transactions to the absolute minimum), and lets users settle debts with one click via instant, secure, on-screen UPI QR codes.
 
 ---
 
-## 🛠️ Technology Stack
+## How It Works
+
+SettliX is designed for seamless, friction-free group expense splits in 4 simple steps:
+
+```
+Create Group 👥  ➔  Log Expenses 💰  ➔  Optimize Debts ⚖️  ➔  Scan & Settle ⚡
+```
+
+1. **Create Group:** Open a group ledger, add friends, and associate their UPI IDs.
+2. **Log Expenses:** Add bills. Choose to split equally, unequally by custom amounts, or by custom percentages.
+3. **Minimize Transactions:** The algorithm calculates the net balances and simplifies payments (e.g., if A owes B ₹500 and B owes C ₹500, A pays C ₹500 directly).
+4. **Instant Settlement:** Scan dynamically generated QR codes with Google Pay, PhonePe, Paytm, or BHIM.
+
+---
+
+## Features
+
+| Feature | Description |
+|---|---|
+| **Optimized Settlement Engine** | Calculates exactly who owes whom using the minimum number of transactions. |
+| **Instant UPI QR Codes** | Generates direct checkout QR codes pre-populated with the exact amount, payee name, and payment note. |
+| **Flexible Split Types** | Split equally, by specific custom amounts (unequally), or by percentages per member. |
+| **Premium Responsive UI** | A fully responsive, modern glassmorphic interface that behaves beautifully on desktop, tablet, and mobile. |
+| **CSV & PDF Export** | Download the transaction history as a CSV file or print/save the entire ledger to PDF. |
+| **No-Custody P2P Security** | 100% peer-to-peer. SettliX never holds or touches user funds; payments happen directly between bank accounts. |
+| **Google SSO Integration** | Secure and easy authentication using Google Single Sign-On (with local mock fallbacks for offline testing). |
+
+---
+
+## Technology Stack
 
 | Layer | Technology | Purpose |
-| :--- | :--- | :--- |
-| **Frontend** | **Next.js 14** (Pages Router) & React | Hybrid page rendering & API routes |
-| **Styling** | **Tailwind CSS v3** & Headless UI | Modern glassmorphic styles & transitions |
-| **Animations** | **Framer Motion** | Premium, tactile user interactions |
-| **Database** | **MongoDB** & Mongoose | Group, expense, and transaction persistence |
-| **Payments** | **Dynamic UPI Protocol** | Direct P2P mobile routing (GPay, PhonePe, Paytm) |
+|---|---|---|
+| **Frontend Framework** | Next.js 14 (Pages Router) | Optimized static rendering, hydration, and routing |
+| **Database** | MongoDB + Mongoose | Real-time persistence for groups, users, and expense history |
+| **Styling** | Tailwind CSS v3 + Headless UI | Modern layout grid, dynamic cards, and components |
+| **Animations** | Framer Motion | Smooth state transitions and micro-interactions |
+| **UPI Engine** | Custom Dynamic UPI URI Resolver | Generates standard compliant UPI merchant and peer links |
+| **Deployment** | Vercel | Globally distributed hosting with auto CI/CD |
 
 ---
 
-## 🚀 Getting Started
+## Quick Start
 
-### 1. Prerequisites
-Ensure you have [Node.js](https://nodejs.org/) (v18+) and [npm](https://www.npmjs.com/) installed on your machine.
+### Prerequisites
+- Node.js (v18+)
+- npm
+- A MongoDB cluster (Local or MongoDB Atlas)
 
-### 2. Installation
-Clone the repository and install the project dependencies:
-```bash
-git clone https://github.com/TheAkashKumawat/SettliX.git
-cd expense-splitter
-npm install
-```
+### Local Development
 
-### 3. Environment Variables Configuration
-Create a `.env.local` file in the root of the project directory:
-```env
-MONGODB_URI=mongodb+srv://<username>:<password>@your-cluster.mongodb.net/settlix?retryWrites=true&w=majority
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/TheAkashKumawat/SettliX.git
+   cd expense-splitter
+   ```
 
-# Optional: Add Google Client ID to enable real Google SSO Authentication
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-```
+2. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-### 4. Running the App Locally
-Start the Next.js development server:
-```bash
-npm run dev
-```
-Open **[http://localhost:3000](http://localhost:3000)** in your web browser to access the local environment.
+3. **Configure Environment Variables:**
+   Create a `.env.local` file in the root directory:
+   ```env
+   MONGODB_URI=mongodb+srv://<username>:<password>@your-cluster.mongodb.net/settlix?retryWrites=true&w=majority
+   NEXT_PUBLIC_GOOGLE_CLIENT_ID=352532278258-u94l4is79ma9j49rr9o2n3b9qtmeh1u7.apps.googleusercontent.com
+   ```
 
----
-
-## 🔒 Security & Privacy First
-* **Zero Funds Custody:** SettliX is 100% peer-to-peer. It never handles, touches, or holds your money.
-* **Direct Handshake:** Payments are executed securely through your own bank's UPI app using the generated QR codes. SettliX merely registers the transaction logs for transparency.
+4. **Launch Local Server:**
+   ```bash
+   npm run dev
+   ```
+   Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
 ---
 
-## ☁️ Deployment
+## Build Status
 
-### Database (MongoDB Atlas)
-1. Provision a free cluster on [MongoDB Atlas](https://www.mongodb.com/atlas).
-2. Create a database user and whitelist connections (`0.0.0.0/0`) under Network Access.
-3. Retrieve your connection URI and configure it under `MONGODB_URI`.
+| Module | Status | Description |
+|---|---|---|
+| Core Engine | ✅ Complete | Multi-split methods, transaction optimization algorithm |
+| Responsive Layouts | ✅ Complete | Fully optimized mobile viewport, responsive tables, flex-stacking components |
+| UPI Integration | ✅ Complete | Compliant UPI URL schema generator with scan-to-pay QRs |
+| Google SSO Auth | ✅ Complete | Integrated Google Authentication with fallback simulation |
+| Export Tools | ✅ Complete | CSV download handler, custom PDF media print query rules |
 
-### Frontend & Backend API (Vercel)
-1. Push your code to GitHub.
-2. Link your repository in **[Vercel](https://vercel.com/)**.
-3. Add `MONGODB_URI` (and optionally `NEXT_PUBLIC_GOOGLE_CLIENT_ID`) to the environment variables under Project Settings.
-4. Click **Deploy** to publish the app.
+---
+
+<div align="center">
+
+<br/>
+
+Built by [**Akash Kumawat**](https://github.com/TheAkashKumawat) &nbsp;·&nbsp; [GitHub Profile](https://github.com/TheAkashKumawat)
+
+<br/>
+
+*If SettliX helps you split and settle expenses easily, give it a* ⭐
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,40:022c22,70:064e3b,100:0f172a&height=120&section=footer" width="100%"/>
+
+</div>
