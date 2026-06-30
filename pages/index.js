@@ -42,6 +42,9 @@ export default function Home({ groups = [], user = null }) {
 
   // Load Google Identity Service Client Script
   useEffect(() => {
+    let resizeListener;
+    let resizeTimeout;
+
     if (!user && googleClientId) {
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
@@ -55,13 +58,38 @@ export default function Home({ groups = [], user = null }) {
             client_id: googleClientId,
             callback: handleGoogleCallback,
           });
-          window.google.accounts.id.renderButton(
-            document.getElementById('google-btn-container'),
-            { theme: 'outline', size: 'large', width: 340 }
-          );
+
+          const renderGoogleButton = () => {
+            const container = document.getElementById('google-btn-container');
+            if (container) {
+              container.innerHTML = '';
+              const containerWidth = container.offsetWidth || (window.innerWidth < 380 ? 280 : 340);
+              const buttonWidth = Math.min(400, Math.max(200, containerWidth));
+              window.google.accounts.id.renderButton(container, {
+                theme: 'outline',
+                size: 'large',
+                width: buttonWidth,
+              });
+            }
+          };
+
+          renderGoogleButton();
+
+          resizeListener = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(renderGoogleButton, 150);
+          };
+          window.addEventListener('resize', resizeListener);
         }
       };
     }
+
+    return () => {
+      if (resizeListener) {
+        window.removeEventListener('resize', resizeListener);
+      }
+      clearTimeout(resizeTimeout);
+    };
   }, [user, googleClientId]);
 
   const handleGoogleCallback = async (response) => {
